@@ -46,8 +46,11 @@ def text_to_speech(engine, s):
     engine.runAndWait()
 
 def wiki(text):
-    title = (wikipedia.search(text, results=1))[0]
-    return (wikipedia.summary(title, sentences=2, auto_suggest=False, redirect=True))
+    try:
+        title = (wikipedia.search(text, results=1))[0]
+        return (wikipedia.summary(title, sentences=2, auto_suggest=False, redirect=True))
+    except (IndexError, wikipedia.exceptions.WikipediaException):
+        return "I could not find anything about it"
 
 if __name__ == "__main__":
     main()
