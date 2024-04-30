@@ -4,13 +4,15 @@ import wikipedia
 import string
 import re
 
-#setx OPENAI_API_KEY "sk-proj-PtvckSpuvie2xWq4tHVST3BlbkFJuxLGCkPg1QiOl2CrIBba"
 def main():
     r = sr.Recognizer()
     engine = pyttsx3.init()  
-    wake_word = "hey Bob"
+    voice_id = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-US_ZIRA_11.0"
+    engine.setProperty('voice', voice_id)
+    wake_word = "hey bob"
     stop_word = "stop the program"
-    
+    welcome = "Welcome, I am Bob your personal assistant."
+    text_to_speech(engine, welcome)
     recognise(r, engine, wake_word, stop_word)
     
 def recognise(r, engine, wake, stop):
@@ -24,6 +26,7 @@ def recognise(r, engine, wake, stop):
                     print("Searching Wikipedia...")
                     text_to_speech(engine, wiki(extract_word(text)))
                 elif stop.casefold() in text.casefold():
+                    text_to_speech(engine, "Shutting down. Bye.")
                     break
             except sr.UnknownValueError:
                 print("Google Speech Recognition could not understand audio")
