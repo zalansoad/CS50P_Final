@@ -3,6 +3,9 @@ import speech_recognition as sr
 import wikipedia
 import string
 import re
+import python_weather
+import asyncio
+import os
 
 def main():
     r = sr.Recognizer()
@@ -25,8 +28,14 @@ def recognise(r, engine, wake, stop, name):
                 text = r.recognize_google(audio).lower()
                 if wake.casefold() in text.casefold():
                     print(text)
-                    print("Searching Wikipedia...")
-                    text_to_speech(engine, wiki(extract_word(text, name)))
+                    if "what is the temperature in" in text.lower() or "what's the temperature in" in text.lower():
+                        print("Checking temperature")
+                        city = extract_word(text, name)
+                        temp = asyncio.run(getweather(city))
+                        text_to_speech(engine, f"It is {temp} Celsius at the moment.")
+                    else:
+                        print("Searching Wikipedia...")
+                        text_to_speech(engine, wiki(extract_word(text, name)))
                 elif stop.casefold() in text.casefold():
                     text_to_speech(engine, "Shutting down. Bye.")
                     break
@@ -39,9 +48,8 @@ def extract_word(text, name):
 
     cleaned_text = text.translate(str.maketrans('', '', string.punctuation))
 
-    match = re.search(rf"(hey {name} whats a|hey {name} whats an|hey {name} what are|hey {name} who is|hey {name} who was|hey {name} tell me about|hey {name} what do you know about|hey {name} what is a|hey {name} what is an)\s+(.*)", cleaned_text)
+    match = re.search(rf"(hey {name} whats the temperature in|hey {name} what is the temperature in|hey {name} whats a|hey {name} whats an|hey {name} what are|hey {name} who is|hey {name} who was|hey {name} tell me about|hey {name} what do you know about|hey {name} what is a|hey {name} what is an)\s+(.*)", cleaned_text)
     if match:
-
         return match.group(2).strip()
     else:
         return None
@@ -58,6 +66,11 @@ def wiki(text):
         return (wikipedia.summary(title, sentences=2, auto_suggest=False, redirect=True))
     except (IndexError, wikipedia.exceptions.WikipediaException):
         return "I could not find anything about it"
+
+async def getweather(city):
+  async with python_weather.Client() as client:
+    weather = await client.get(city)
+    return weather.temperature
 
 if __name__ == "__main__":
     main()
