@@ -5,7 +5,7 @@ import string
 import re
 import python_weather
 import asyncio
-import os
+import random
 
 def main():
     r = sr.Recognizer()
@@ -32,12 +32,18 @@ def recognise(r, engine, wake, stop, name):
                         print("Checking temperature")
                         city = extract_word(text, name)
                         temp = asyncio.run(getweather(city))
-                        text_to_speech(engine, f"It is {temp} Celsius at the moment.")
+                        if temp == "Sorry I didn't understand the city clearly.":
+                            text_to_speech(engine, "Sorry I didn't understand the city clearly.")
+                        else:
+                            text_to_speech(engine, f"It is {temp} Celsius at the moment in {city.capitalize()}.")
+                    elif "flip a coin" in text.lower():
+                        coin = flip_coin()
+                        text_to_speech(engine, f"It's a {coin}.")
                     else:
                         print("Searching Wikipedia...")
                         text_to_speech(engine, wiki(extract_word(text, name)))
                 elif stop.casefold() in text.casefold():
-                    text_to_speech(engine, "Shutting down. Bye.")
+                    text_to_speech(engine, "This was CS Fifty P... Shutting down... Bye...")
                     break
             except sr.UnknownValueError:
                 print("Google Speech Recognition could not understand audio")
@@ -69,8 +75,15 @@ def wiki(text):
 
 async def getweather(city):
   async with python_weather.Client() as client:
-    weather = await client.get(city)
-    return weather.temperature
+    try:
+        weather = await client.get(city)
+        return weather.temperature
+    except python_weather.errors.Error:
+        return "Sorry I didn't understand the city clearly."
+
+def flip_coin():
+    options = ["head", "tail"]
+    return random.choice(options)
 
 if __name__ == "__main__":
     main()

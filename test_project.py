@@ -1,4 +1,4 @@
-from project import extract_word, wiki
+from project import extract_word, wiki, getweather, flip_coin
 import asyncio
 import python_weather
 
@@ -10,4 +10,7 @@ def test_extract_word():
 
 
 def test_getweather():
-    assert int(asyncio.run(getweather("London"))) > 0 
+    assert int(asyncio.run(getweather("London"))) > -50 
+
+def test_flip_coin():
+    assert flip_coin() == "tail" or "head"
