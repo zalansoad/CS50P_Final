@@ -1,4 +1,7 @@
 pyttsx3
-speech_recognition
+SpeechRecognition
 wikipedia
 python_weather
+PyAudio
+Pytest
+setuptools
