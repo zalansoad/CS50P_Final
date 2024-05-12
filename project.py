@@ -6,13 +6,17 @@ import re
 import python_weather
 import asyncio
 import random
+import sys
 
 def main():
+    if not len(sys.argv) == 2:
+        print("Usage: python project.py <name>")
+        sys.exit(1)
     r = sr.Recognizer()
     engine = pyttsx3.init()  
     voice_id = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Speech\Voices\Tokens\TTS_MS_EN-GB_HAZEL_11.0"
     engine.setProperty('voice', voice_id)
-    name = "Lucy"
+    name = sys.argv[1]
     wake_word = f"hey {name}"
     stop_word = "stop the program"
     welcome = f"Welcome, I am {name} your personal assistant."
